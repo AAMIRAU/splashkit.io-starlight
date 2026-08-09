@@ -287,6 +287,137 @@ int main()
 ```
 
 </TabItem>
+
+<TabItem label="C#">
+
+```csharp
+using SplashKitSDK;
+using static SplashKitSDK.SplashKit;
+
+int brightness = 128;
+const int maxBrightness = 255;
+ulong lastReadTime = 0;
+const ulong readInterval = 400;
+
+Connection pi = RemoteRaspiInit(
+    "my_pi",
+    "PI_IP_ADDRESS",
+    8888
+);
+
+GpioPin ledPin = GpioPin.Pin11;
+GpioPin increaseBtnPin = GpioPin.Pin13;
+GpioPin decreaseBtnPin = GpioPin.Pin29;
+
+RemoteRaspiSetMode(
+    pi,
+    ledPin,
+    GpioPinMode.GpioOutput
+);
+
+RemoteRaspiSetPwmDutycycle(
+    pi,
+    ledPin,
+    brightness
+);
+
+RemoteRaspiSetMode(
+    pi,
+    increaseBtnPin,
+    GpioPinMode.GpioInput
+);
+
+RemoteRaspiSetMode(
+    pi,
+    decreaseBtnPin,
+    GpioPinMode.GpioInput
+);
+
+RemoteRaspiSetPullUpDown(
+    pi,
+    increaseBtnPin,
+    GpioPullUpDown.PudDown
+);
+
+RemoteRaspiSetPullUpDown(
+    pi,
+    decreaseBtnPin,
+    GpioPullUpDown.PudDown
+);
+
+Timer runTimer = CreateTimer("run_timer");
+StartTimer(runTimer);
+
+ulong currentTime = 0;
+
+OpenWindow("dummy_window", 1, 1);
+
+while (!AnyKeyPressed())
+{
+    ProcessEvents();
+
+    currentTime = TimerTicks(runTimer);
+
+    if (currentTime - lastReadTime > readInterval)
+    {
+        if (
+            RemoteRaspiRead(
+                pi,
+                increaseBtnPin
+            ) == GpioPinValue.GpioHigh
+        )
+        {
+            brightness += 25;
+
+            if (brightness > maxBrightness)
+            {
+                brightness = maxBrightness;
+            }
+
+            RemoteRaspiSetPwmDutycycle(
+                pi,
+                ledPin,
+                brightness
+            );
+
+            lastReadTime = currentTime;
+        }
+
+        if (
+            RemoteRaspiRead(
+                pi,
+                decreaseBtnPin
+            ) == GpioPinValue.GpioHigh
+        )
+        {
+            brightness -= 25;
+
+            if (brightness < 0)
+            {
+                brightness = 0;
+            }
+
+            RemoteRaspiSetPwmDutycycle(
+                pi,
+                ledPin,
+                brightness
+            );
+
+            lastReadTime = currentTime;
+        }
+    }
+}
+
+CloseAllWindows();
+
+StopTimer(runTimer);
+FreeAllTimers();
+
+RemoteRaspiCleanup(pi);
+```
+
+</TabItem>
+
 </Tabs>
 
 </TabItem>

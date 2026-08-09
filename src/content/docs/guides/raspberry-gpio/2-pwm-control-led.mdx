@@ -205,6 +205,63 @@ int main()
 ```
 
 </TabItem>
+<TabItem label="C#">
+
+```csharp
+using SplashKitSDK;
+using static SplashKitSDK.SplashKit;
+
+int[] freqs = {
+    10, 20, 40, 50, 80, 100, 160, 200, 250,
+    320, 400, 500, 800, 1000, 1600, 2000, 4000, 8000
+};
+
+const int pwmRange = 255;
+
+Connection pi = RemoteRaspiInit(
+    "my_pi",
+    "PI_IP_ADDRESS",
+    8888
+);
+
+GpioPin ledPin = GpioPin.Pin11;
+
+RemoteRaspiSetMode(
+    pi,
+    ledPin,
+    GpioPinMode.GpioOutput
+);
+
+RemoteRaspiSetPwmRange(
+    pi,
+    ledPin,
+    pwmRange
+);
+
+RemoteRaspiSetPwmDutycycle(
+    pi,
+    ledPin,
+    pwmRange / 2
+);
+
+foreach (int frequency in freqs)
+{
+    Write("At Frequency: ");
+    WriteLine(frequency);
+
+    RemoteRaspiSetPwmFrequency(
+        pi,
+        ledPin,
+        frequency
+    );
+
+    Delay(1000);
+}
+
+RemoteRaspiCleanup(pi);
+```
+
+</TabItem>
 </Tabs>
 
 </TabItem>
@@ -532,7 +589,77 @@ int main()
 ```
 
 </TabItem>
+
+
+<TabItem label="C#">
+
+```csharp
+using SplashKitSDK;
+using static SplashKitSDK.SplashKit;
+
+const int pwmRange = 255;
+
+Connection pi = RemoteRaspiInit(
+    "my_pi",
+    "PI_IP_ADDRESS",
+    8888
+);
+
+GpioPin ledPin = GpioPin.Pin11;
+
+RemoteRaspiSetMode(
+    pi,
+    ledPin,
+    GpioPinMode.GpioOutput
+);
+
+RemoteRaspiSetPwmFrequency(
+    pi,
+    ledPin,
+    1000
+);
+
+RemoteRaspiSetPwmRange(
+    pi,
+    ledPin,
+    pwmRange
+);
+
+for (int i = 0; i <= pwmRange; i += 10)
+{
+    Write("At Duty Cycle: ");
+    WriteLine(i);
+
+    RemoteRaspiSetPwmDutycycle(
+        pi,
+        ledPin,
+        i
+    );
+
+    Delay(1000);
+}
+
+for (int i = pwmRange; i >= 0; i -= 10)
+{
+    Write("At Duty Cycle: ");
+    WriteLine(i);
+
+    RemoteRaspiSetPwmDutycycle(
+        pi,
+        ledPin,
+        i
+    );
+
+    Delay(1000);
+}
+
+RemoteRaspiCleanup(pi);
+```
+
+</TabItem>
+
 </Tabs>
+
 
 </TabItem>
 </Tabs>
